@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="免費、簡單、快速的 QR Code 生成器。支援文字、網址、Email、電話、簡訊等多種格式。">
+    <meta name="keywords" content="QR Code生成器, 二維碼產生器, 免費QR Code">
+    
+    <meta property="og:title" content="QR Code 生成器 - 免費快速產生二維碼">
+    <meta property="og:description" content="貼上文字或網址，即時生成 QR Code">
+    <meta property="og:type" content="website">
+    
+    <title>QR Code 生成器 | 免費二維碼產生器</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- QR Code Library (純 JS) -->
+    <script src="qrcode.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+            background: #f8f7fc;
+            color: #1d1c1f;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 60px 0 40px;
+        }
+
+        .icon-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(82, 88, 150, 0.1);
+            padding: 8px 20px;
+            border-radius: 60px;
+            margin-bottom: 28px;
+        }
+
+        .icon-badge i {
+            font-size: 20px;
+            color: #525896;
+        }
+
+        .icon-badge span {
+            font-size: 13px;
+            font-weight: 500;
+            color: #525896;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #1d1c1f;
+            margin-bottom: 12px;
+        }
+
+        h1 i {
+            color: #525896;
+            font-size: 44px;
+            margin-right: 8px;
+        }
+
+        .subtitle {
+            font-size: 17px;
+            font-weight: 400;
+            color: #6e6d73;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* 主要內容 */
+        .main-card {
+            background: #ffffff;
+            border-radius: 32px;
+            padding: 32px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e8e6f0;
+            margin-bottom: 40px;
+        }
+
+        /* 輸入區域 */
+        .input-section {
+            margin-bottom: 32px;
+        }
+
+        .label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1d1c1f;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .label i {
+            color: #525896;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: #f8f7fc;
+            border: 1px solid #e8e6f0;
+            border-radius: 20px;
+            padding: 4px;
+            transition: all 0.2s;
+        }
+
+        .input-group:focus-within {
+            border-color: #525896;
+            box-shadow: 0 0 0 3px rgba(82, 88, 150, 0.1);
+        }
+
+        .input-group input, 
+        .input-group textarea {
+            flex: 1;
+            padding: 14px 18px;
+            font-size: 15px;
+            background: transparent;
+            border: none;
+            border-radius: 16px;
+            color: #1d1c1f;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .input-group input:focus,
+        .input-group textarea:focus {
+            outline: none;
+        }
+
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: #aaa8b5;
+        }
+
+        .btn-primary {
+            padding: 12px 24px;
+            background: #525896;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #40446e;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            padding: 10px 20px;
+            background: #f8f7fc;
+            color: #525896;
+            border: 1px solid #e8e6f0;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: #525896;
+            color: white;
+            border-color: #525896;
+        }
+
+        /* 格式選擇 */
+        .format-section {
+            margin-bottom: 32px;
+        }
+
+        .format-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .format-btn {
+            padding: 8px 16px;
+            background: #f8f7fc;
+            border: 1px solid #e8e6f0;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #6e6d73;
+        }
+
+        .format-btn.active {
+            background: #525896;
+            border-color: #525896;
+            color: white;
+        }
+
+        .format-btn:hover:not(.active) {
+            background: #e8e6f0;
+        }
+
+        /* 尺寸選擇 */
+        .size-section {
+            margin-bottom: 32px;
+        }
+
+        .size-slider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            background: #e8e6f0;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #525896;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .size-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #525896;
+            min-width: 60px;
+        }
+
+        /* QR Code 展示區 */
+        .qrcode-section {
+            text-align: center;
+            padding: 32px;
+            background: #f8f7fc;
+            border-radius: 24px;
+            margin-bottom: 24px;
+        }
+
+        #qrcode {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        /* 下載按鈕 */
+        .download-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 48px 0 40px;
+            border-top: 1px solid #e8e6f0;
+            margin-top: 40px;
+            color: #8e8d9a;
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: #8e8d9a;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #525896;
+        }
+
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #25D366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            border: none;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            background-color: #128C7E;
+        }
+
+        /* 響應式 */
+        @media (max-width: 640px) {
+            .header {
+                padding: 40px 0 24px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            h1 i {
+                font-size: 28px;
+            }
+            
+            .main-card {
+                padding: 20px;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                font-size: 28px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="icon-badge">
+            <i class="fa-solid fa-qrcode"></i>
+            <span>FREE TOOL</span>
+        </div>
+        <h1>
+            <i class="fa-solid fa-qrcode"></i> 
+            QR Code 生成器
+        </h1>
+        <p class="subtitle">貼上文字或網址，即時生成免費 QR Code</p>
+    </div>
+
+    <div class="main-card">
+        <!-- 輸入區域 -->
+        <div class="input-section">
+            <div class="label">
+                <i class="fa-regular fa-pen-to-square"></i>
+                <span>輸入內容</span>
+            </div>
+            <div class="input-group">
+                <textarea id="inputText" rows="3" placeholder="貼上網址、文字、電話號碼、簡訊內容..."></textarea>
+                <button class="btn-primary" onclick="generateQR()">
+                    <i class="fa-solid fa-qrcode"></i> 生成 QR Code
+                </button>
+            </div>
+        </div>
+
+        <!-- 快速格式選擇 -->
+        <div class="format-section">
+            <div class="label">
+                <i class="fa-regular fa-star"></i>
+                <span>快速格式</span>
+            </div>
+            <div class="format-buttons">
+                <button class="format-btn" onclick="setFormat('url')">🔗 網址</button>
+                <button class="format-btn" onclick="setFormat('text')">📝 文字</button>
+                <button class="format-btn" onclick="setFormat('phone')">📞 電話</button>
+                <button class="format-btn" onclick="setFormat('email')">✉️ Email</button>
+                <button class="format-btn" onclick="setFormat('sms')">💬 簡訊</button>
+                <button class="format-btn" onclick="setFormat('wifi')">📶 WiFi</button>
+            </div>
+        </div>
+
+        <!-- 尺寸選擇 -->
+        <div class="size-section">
+            <div class="label">
+                <i class="fa-regular fa-expand"></i>
+                <span>QR Code 尺寸</span>
+            </div>
+            <div class="size-slider">
+                <input type="range" id="sizeSlider" min="100" max="600" step="10" value="300">
+                <span class="size-value"><span id="sizeValue">300</span> x <span id="sizeValue2">300</span> px</span>
+            </div>
+        </div>
+
+        <!-- QR Code 展示區 -->
+        <div class="qrcode-section">
+            <div id="qrcode"></div>
+        </div>
+
+        <!-- 下載按鈕 -->
+        <div class="download-buttons">
+            <button class="btn-secondary" onclick="downloadPNG()">
+                <i class="fa-regular fa-image"></i> 下載 PNG
+            </button>
+            <button class="btn-secondary" onclick="downloadSVG()">
+                <i class="fa-regular fa-file-code"></i> 下載 SVG
+            </button>
+            <button class="btn-secondary" onclick="copyQRCode()">
+                <i class="fa-regular fa-copy"></i> 複製圖片
+            </button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><i class="fa-regular fa-copyright"></i> 免費 QR Code 生成器 · 無需註冊 · 全部在瀏覽器處理</p>
+    </div>
+</div>
+
+<!-- WhatsApp 浮動按鈕 -->
+<a href="https://wa.me/85297587491" 
+   class="whatsapp-float" 
+   target="_blank"
+   rel="noopener noreferrer">
+	<i class="fa-brands fa-whatsapp"></i>
+</a>
+
+<script>
+    let currentQR = null;
+
+    // 生成 QR Code
+    function generateQR() {
+        const inputText = document.getElementById('inputText').value.trim();
+        if (!inputText) {
+            alert('請輸入內容');
+            return;
+        }
+
+        const size = parseInt(document.getElementById('sizeSlider').value);
+        
+        // 清空舊的
+        document.getElementById('qrcode').innerHTML = '';
+        
+        // 生成新的 QR Code
+        currentQR = new QRCode(document.getElementById('qrcode'), {
+            text: inputText,
+            width: size,
+            height: size,
+            colorDark: "#1d1c1f",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+
+    // 設定格式範例
+    function setFormat(type) {
+        let example = '';
+        switch(type) {
+            case 'url':
+                example = 'https://example.com';
+                break;
+            case 'text':
+                example = 'Hello World! 你好世界！';
+                break;
+            case 'phone':
+                example = 'tel:+85212345678';
+                break;
+            case 'email':
+                example = 'mailto:hello@example.com';
+                break;
+            case 'sms':
+                example = 'sms:+85212345678?body=Hello';
+                break;
+            case 'wifi':
+                example = 'WIFI:T:WPA;S:MyWiFi;P:password123;;';
+                break;
+        }
+        document.getElementById('inputText').value = example;
+        generateQR();
+    }
+
+    // 監聽尺寸變化
+    document.getElementById('sizeSlider').addEventListener('input', function() {
+        const val = this.value;
+        document.getElementById('sizeValue').innerText = val;
+        document.getElementById('sizeValue2').innerText = val;
+        if (document.getElementById('inputText').value.trim()) {
+            generateQR();
+        }
+    });
+
+    // 下載 PNG
+    function downloadPNG() {
+        const canvas = document.querySelector('#qrcode canvas');
+        if (!canvas) {
+            alert('請先生成 QR Code');
+            return;
+        }
+        const link = document.createElement('a');
+        link.download = 'qrcode.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+
+    // 下載 SVG
+    function downloadSVG() {
+        const canvas = document.querySelector('#qrcode canvas');
+        if (!canvas) {
+            alert('請先生成 QR Code');
+            return;
+        }
+        
+        // 將 canvas 轉成 SVG（簡單方法：用圖片）
+        const imgData = canvas.toDataURL('image/png');
+        const svg = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}">
+                <image href="${imgData}" width="${canvas.width}" height="${canvas.height}"/>
+            </svg>
+        `;
+        const blob = new Blob([svg], { type: 'image/svg+xml' });
+        const link = document.createElement('a');
+        link.download = 'qrcode.svg';
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    // 複製圖片到剪貼簿
+    async function copyQRCode() {
+        const canvas = document.querySelector('#qrcode canvas');
+        if (!canvas) {
+            alert('請先生成 QR Code');
+            return;
+        }
+        
+        try {
+            const blob = await new Promise(resolve => canvas.toBlob(resolve));
+            await navigator.clipboard.write([
+                new ClipboardItem({
+                    [blob.type]: blob
+                })
+            ]);
+            alert('QR Code 已複製到剪貼簿');
+        } catch (err) {
+            alert('複製失敗，可以試試下載圖片');
+        }
+    }
+
+    // 預設生成一個範例
+    window.onload = () => {
+        document.getElementById('inputText').value = 'https://example.com';
+        generateQR();
+    };
+</script>
+</body>
+</html>
